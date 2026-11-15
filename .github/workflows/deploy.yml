@@ -1,4 +1,5 @@
-# deploy: build the site and publish it to https://ycash.team (ycash-ops site/ycash-team/).
+# deploy: build the site and publish it to https://ycash.team (the infrastructure is in the private
+# operations repository, site/ycash-team/).
 # Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
 #
 # In plain words: every push to upgrade/vault (a merged pull request, or a click on "Run workflow")
@@ -11,11 +12,11 @@
 # only the AWS CLI on that artifact.
 #
 # AWS access is OIDC only, no stored keys. `deploy` runs in the GitHub environment `site-deploy`
-# (deployment branch upgrade/vault only). If this repository emits GitHub's immutable OIDC subject
-# (as kogany-site does), the deploy role trusts exactly
-# repo:boyfromcave@<owner_id>/ycash-team-site@<repo_id>:environment:site-deploy (ycash-ops README,
-# "The ycash.team site"). The role may only write this bucket and invalidate this distribution. The
-# environment holds three values (from `terraform output -raw` in ycash-ops site/ycash-team/):
+# (deployment branch upgrade/vault only). This repository emits GitHub's immutable OIDC subject
+# (use_immutable_subject, turned on when it was created), and the deploy role trusts exactly
+# repo:boyfromcave@<owner_id>/ycash-team-site@<repo_id>:environment:site-deploy (the operations
+# repository's README, "The ycash.team site"). The role may only write this bucket and invalidate this distribution. The
+# environment holds three values (from `terraform output -raw` in the operations repository's site/ycash-team/):
 # YCASH_TEAM_SITE_ROLE_ARN, YCASH_TEAM_SITE_BUCKET, YCASH_TEAM_SITE_DISTRIBUTION_ID. They are
 # environment secrets, never committed: this repository is public and so are its logs, and secrets
 # are masked in them (the values are masked below as well).

@@ -1,9 +1,14 @@
 # ycash-team-site — ycash.team
 
-The start page for people who are new to Ycash: the Ycash logo, "Ycash = Your …" with a rotating
-word, and eight product tiles in two rows ("Use Ycash", "Run and build"). Each tile leads to a
-one-screen page on the site: what the product is, how to get it, one button. Plain static files,
-no build step, no dependencies.
+The start page for people who are new to Ycash. At the top, centred: the Ycash logo and the word
+"Ycash" under it; below them the line "Your …" with a rotating phrase (Electronic Cash, Team, Life,
+Family, Collateral, Assets, Wallet, Future, ❤️, Friends, 🛡️, Vault). "Your" stays fixed to the
+pixel: the line is split just left of the page's centre, "Your" ends there and the phrase starts
+there and grows rightward (on a phone the line is one centred block as wide as "Your Electronic
+Cash", left-aligned inside). A small button pauses the phrases. Below: eight product tiles in two
+rows ("Use Ycash", "Run and build"); each leads to a one-screen page on the site: what the product
+is, how to get it, one button. No other text, no footer links. Plain static files, no build step,
+no dependencies.
 
 ```bash
 make serve   # http://127.0.0.1:8095/ (serves this directory as it is)
@@ -26,7 +31,9 @@ make links   # the same, plus every external link must answer
 ## Change things
 
 - **Rotating words:** the `WORDS` list at the top of `assets/site.js` (order is the order shown;
-  `HOLD_MS` is how long each stays). Without JavaScript the line reads "Ycash = Your Electronic Cash".
+  `HOLD_MS` is how long each stays). Without JavaScript the line reads "Your Electronic Cash". If a
+  new phrase is longer than "Electronic Cash", put it in the `.sizer` span of `index.html` too: the
+  slot reserves that phrase's width. Where the line splits is `--split` on `.line` in `site.css`.
 - **Tiles:** each `<li class="tile">` in `index.html`: an icon, the name (the link to the product
   page), one short line, and a small `<span class="tag">` label (Beta, Testnet, In development,
   Coming soon) where it is true.

@@ -1,7 +1,7 @@
 // ycash.team: the rotating word, its pause button, the tile glow, the rise-in.
 // Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
 // Plain script, no dependencies, no inline code. Without it every page still reads
-// correctly: "Ycash = Your Electronic Cash", and every tile is a normal link.
+// correctly: "Ycash" and "Your Electronic Cash", and every tile is a normal link.
 (function () {
   "use strict";
 
@@ -20,21 +20,16 @@
 
   // ---------- the rotating word (start page only) ----------
 
-  var slot = document.getElementById("slot");
+  // The slot reserves the longest phrase in CSS (.sizer), so changing the word moves nothing else:
+  // "Your" keeps its place to the pixel.
+  var hero = document.getElementById("hero");
   var word = document.getElementById("word");
 
   function isEmoji(text) { return !/[A-Za-z]/.test(text); }
 
-  function fit() {
-    // The slot is as wide as the current word, so the line stays centred.
-    // (A CSSOM property, which a Content-Security-Policy without 'unsafe-inline' allows.)
-    slot.style.width = word.getBoundingClientRect().width + "px";
-  }
-
   function show(text) {
     word.textContent = text;
     word.classList.toggle("is-emoji", isEmoji(text));
-    fit();
     word.classList.remove("is-out");
     // next frame, so the browser sees the starting position first
     requestAnimationFrame(function () {
@@ -42,7 +37,7 @@
     });
   }
 
-  if (slot && word) {
+  if (hero && word) {
     var index = 0;
     var timer = null;
     var paused = false;
@@ -60,8 +55,7 @@
     var stop = function () { clearInterval(timer); timer = null; };
 
     // A pause button (WCAG 2.2.2): moving text must be stoppable.
-    var hero = slot.closest(".hero");
-    if (hero) {
+    {
       var ns = "http://www.w3.org/2000/svg";
       var button = document.createElement("button");
       button.type = "button";
@@ -92,9 +86,6 @@
       hero.appendChild(button);
     }
 
-    fit();
-    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
-    window.addEventListener("resize", fit);
     // do not spin in a background tab
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) { stop(); } else { start(); }

@@ -1,7 +1,7 @@
 /* ycash.team: the start page and the product pages.
    Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
    No inline styles or scripts anywhere and no style="" attributes, so the strict
-   Content-Security-Policy (ycash-ops site/ycash-team) needs no 'unsafe-inline'. */
+   Content-Security-Policy (README, "How it is served") needs no 'unsafe-inline'. */
 
 :root {
   --bg: #0b0b0f;
@@ -13,6 +13,7 @@
   --gold: #ffc247;
   --tile: rgba(255, 255, 255, 0.035);
   --radius: 28px;
+  --col: 1112px;       /* the content column: five 208px tiles and four 18px gaps */
   --display: "Space Grotesk", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
@@ -108,18 +109,29 @@ main { flex: 1 0 auto; }
 
 /* ---------- hero ---------- */
 
+/* The hero: the logo and the "Ycash" wordmark centred, then "Your" and the rotating phrase.
+   The phrase line is never centred as a whole (that would move "Your" whenever the phrase changes
+   width): it is two fixed columns split just left of the page's centre line, "Your" right-aligned
+   in the left one and the phrase left-aligned in the right one, so "Your" never moves. */
 .hero {
-  min-height: min(58vh, 560px);
-  min-height: min(58svh, 560px);
+  min-height: min(56vh, 540px);
+  min-height: min(56svh, 540px);
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
+  padding: 64px 16px 28px;
+}
+
+.hero-in {
+  width: 100%;
+  max-width: var(--col);
+  margin: 0 auto;
   text-align: center;
-  padding: 64px 16px 24px;
 }
 
 .logo {
+  display: block;
+  margin: 0 auto;
   width: 112px;
   height: 112px;
   border-radius: 50%;
@@ -137,37 +149,56 @@ main { flex: 1 0 auto; }
   }
 }
 
-.equation {
-  margin: 44px 0 0;
+.title {
+  margin: 22px 0 0;
   font-family: var(--display);
   font-weight: 700;
-  font-size: clamp(2.5rem, 7.4vw, 5.6rem);
-  line-height: 1.06;
-  letter-spacing: -0.035em;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: baseline;
-  gap: 0 0.28em;
 }
 
-.fixed { white-space: nowrap; }
+.wordmark {
+  display: block;
+  font-size: clamp(1.9rem, 3.4vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
 
-.eq { color: var(--muted); font-weight: 500; }
+/* --split: where the gap between "Your" and the phrase sits, measured left of the centre line.
+   Chosen from screenshots of all twelve phrases at 1440, 1024 and 390 px wide. */
+.line {
+  --split: 0.35em;
+  display: grid;
+  grid-template-columns: calc(50% - var(--split)) calc(50% + var(--split));
+  margin-top: 0.42em;
+  font-size: clamp(2.2rem, 5.2vw, 4.4rem);
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-align: left;
+}
 
-/* The slot keeps one line of height so the page never jumps as words change. */
+.fixed {
+  justify-self: end;
+  padding-right: 0.14em;
+  white-space: nowrap;
+}
+
+/* The slot holds the longest phrase, invisibly (.sizer), so its size never changes: the word sits
+   on top of it at the slot's left edge and grows rightward. */
 .slot {
   position: relative;
-  display: inline-block;
-  height: 1.16em;
-  min-width: 1ch;
-  text-align: left;
-  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
-  overflow: visible;
+  justify-self: start;
+  padding-left: 0.14em;
+}
+
+.sizer {
+  visibility: hidden;
+  white-space: nowrap;
+  padding-bottom: 0.08em;
 }
 
 .word {
-  display: inline-block;
+  position: absolute;
+  left: 0.14em;
+  top: 0;
   white-space: nowrap;
   padding-bottom: 0.08em;
   background: linear-gradient(92deg, var(--gold) 0%, var(--orange) 55%, #ff4d6d 100%);
@@ -197,7 +228,7 @@ main { flex: 1 0 auto; }
 
 /* The pause button for the rotating word (added by site.js, so absent without scripts). */
 .pause {
-  margin-top: 28px;
+  margin: 26px auto 0;
   width: 40px;
   height: 40px;
   display: grid;
@@ -221,7 +252,7 @@ main { flex: 1 0 auto; }
 /* ---------- product tiles, in two labelled rows ---------- */
 
 .row {
-  max-width: 1160px;
+  max-width: calc(var(--col) + 32px);
   margin: 0 auto;
   padding: 8px 16px 36px;
 }
@@ -504,8 +535,7 @@ footer {
   color: var(--muted);
 }
 
-footer a { text-decoration: none; transition: color 0.2s; }
-footer a:hover, footer a:focus-visible { color: var(--ink); }
+footer p { margin: 0; }
 
 /* ---------- smaller screens ---------- */
 
@@ -517,12 +547,17 @@ footer a:hover, footer a:focus-visible { color: var(--ink); }
   .tile .tag { margin-bottom: 8px; font-size: 0.56rem; padding: 2px 7px; }
   .tile p { font-size: 0.84rem; }
   .logo { width: 92px; height: 92px; }
-  /* the rotating word takes its own line, centred */
-  .slot { flex-basis: 100%; text-align: center; }
   .card { padding: 30px 22px 26px; border-radius: 26px; }
   .card .tag { top: 30px; right: 20px; }
   .card .icon-lg { width: 60px; height: 60px; padding: 13px; border-radius: 18px; margin-bottom: 20px; }
   .button { width: 100%; justify-content: center; }
+}
+
+/* A phone: the split columns would push the longest phrase off the screen, so the line becomes one
+   block exactly as wide as "Your" plus the longest phrase, centred, text left-aligned inside it,
+   with the type scaled to the screen; "Your" still never moves. */
+@media (max-width: 600px) {
+  .line { display: flex; width: max-content; margin-left: auto; margin-right: auto; font-size: 8.4vw; }
 }
 
 @media (max-width: 340px) {
@@ -536,7 +571,6 @@ footer a:hover, footer a:focus-visible { color: var(--ink); }
   .orb, .logo { animation: none; }
   .word { transition: opacity 0.2s linear; transform: none; filter: none; }
   .word.is-out { transform: none; filter: none; }
-  .slot { transition: none; }
   .js .tile:not(.seen), .js .tile.seen { opacity: 1; translate: 0 0; transition: border-color 0.2s; }
   .tile:hover, .tile:focus-within, .button:hover { transform: none; }
   .tile:hover .icon, .tile:focus-within .icon { transform: none; }
