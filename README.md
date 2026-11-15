@@ -45,7 +45,7 @@ make links   # the same, plus every external link must answer
 
 `https://ycash.team` (with `www.ycash.team` redirecting to it): a private S3 bucket behind
 CloudFront, with HSTS, a strict Content-Security-Policy and the other security headers set by
-CloudFront. The infrastructure is in the private operations repository (`site/ycash-team/`),
+CloudFront. The infrastructure is managed separately and
 applied by hand; this repository's deploy workflow only uploads and invalidates, through an OIDC
 role that may touch that bucket and that distribution and nothing else.
 
