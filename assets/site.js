@@ -1,7 +1,7 @@
 // ycash.team: the rotating word, its pause button, the tile glow, the rise-in.
 // Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
 // Plain script, no dependencies, no inline code. Without it every page still reads
-// correctly: "Ycash" and "Your Electronic Cash", and every tile is a normal link.
+// correctly: "Ycash = Your Electronic Cash", and every tile is a normal link.
 (function () {
   "use strict";
 
@@ -21,8 +21,8 @@
   // ---------- the rotating word (start page only) ----------
 
   // The slot reserves the longest phrase in CSS (.sizer), so changing the word moves nothing else:
-  // "Your" keeps its place to the pixel.
-  var hero = document.getElementById("hero");
+  // "Ycash = Your" keeps its place to the pixel.
+  var corner = document.getElementById("corner");
   var word = document.getElementById("word");
 
   function isEmoji(text) { return !/[A-Za-z]/.test(text); }
@@ -37,7 +37,7 @@
     });
   }
 
-  if (hero && word) {
+  if (corner && word) {
     var index = 0;
     var timer = null;
     var paused = false;
@@ -83,7 +83,7 @@
         button.setAttribute("aria-label", paused ? "Play the moving words" : "Pause the moving words");
         if (paused) { stop(); } else { start(); }
       });
-      hero.appendChild(button);
+      corner.appendChild(button);
     }
 
     // do not spin in a background tab

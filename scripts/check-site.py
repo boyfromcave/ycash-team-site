@@ -13,9 +13,11 @@ Fails (exit 1) on:
   a script or stylesheet from an origin the policy does not list;
 - accessibility basics: an <img> without alt, not exactly one <h1>, a heading level skipped, a
   duplicate id, a link without text, an <svg> that is neither hidden nor labelled;
+- a stylesheet whose braces do not balance (a stray } silently drops every rule after it);
 - an internal link or #fragment that leads nowhere; an external link that is not https;
 - with --external: an external link that does not answer 2xx/3xx (HEAD, then GET).
 """
+import re
 import sys
 import urllib.error
 import urllib.request
@@ -191,6 +193,20 @@ def check_svg(path):
     return bad
 
 
+def check_css(path):
+    """Braces must balance (outside comments and strings): one stray } drops the rules after it."""
+    text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+    text = re.sub(r'"(?:\\.|[^"\\])*"', '""', text)
+    depth = 0
+    for n, line in enumerate(text.split("\n"), 1):
+        for ch in line:
+            depth += ch == "{"
+            depth -= ch == "}"
+            if depth < 0:
+                return [f"line {n}: a }} without its {{"]
+    return [f"{depth} unclosed {{"] if depth else []
+
+
 def check_external(url):
     for method in ("HEAD", "GET"):
         req = urllib.request.Request(url, method=method, headers={"User-Agent": "ycash-team-site-linkcheck"})
@@ -223,6 +239,11 @@ def main(argv):
     for svg in sorted(root.rglob("*.svg")):
         for msg in check_svg(svg):
             print(f"{svg.relative_to(root)}: {msg}")
+            errors += 1
+
+    for css in sorted(root.rglob("*.css")):
+        for msg in check_css(css):
+            print(f"{css.relative_to(root)}: {msg}")
             errors += 1
 
     for html in sorted(root.rglob("*.html")):

@@ -7,8 +7,8 @@
    (`docs/plans/explorer/`) and kogany-site's pages. Never invent a release, date, feature or URL, and no
    roadmap promises: a product without a release says so and links its source; a service that is not
    live is not named.
-2. **Written for a newcomer.** Almost no text: the start page is the logo, the "Ycash" wordmark, "Your …"
-   with the rotating phrase, and the tiles (no sentence under the rotating line, beta3 plan decision B3-D10); a product page is one or two
+2. **Written for a newcomer.** Almost no text: the start page is "Ycash = Your …" with the rotating
+   phrase in the corner, the logo and the tiles (no sentence under the rotating line, beta3 plan decision B3-D10); a product page is one or two
    plain sentences, how to get it, one button.
 3. **Strict CSP.** No inline `<script>`, no `<style>` element, no `style=""` attribute (also not in an
    SVG), no `on*=` handler. `make check` enforces it; the policy itself is set by CloudFront (README, "How it is served").
