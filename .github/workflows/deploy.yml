@@ -1,0 +1,117 @@
+# deploy: build the site and publish it to https://ycash.team (ycash-ops site/ycash-team/).
+# Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
+#
+# In plain words: every push to upgrade/vault (a merged pull request, or a click on "Run workflow")
+# copies the published files into public/ and checks them; a second job, the only one with AWS
+# access, uploads that build to the site's bucket and tells CloudFront to drop its cached copy.
+# Nothing waits: the invalidation is requested and the job ends.
+#
+# Two jobs, so the build (which runs the repository's own code) never holds an OIDC token: `build`
+# has contents: read only and hands public/ over as an artifact; `deploy` runs no repository code,
+# only the AWS CLI on that artifact.
+#
+# AWS access is OIDC only, no stored keys. `deploy` runs in the GitHub environment `site-deploy`
+# (deployment branch upgrade/vault only). If this repository emits GitHub's immutable OIDC subject
+# (as kogany-site does), the deploy role trusts exactly
+# repo:boyfromcave@<owner_id>/ycash-team-site@<repo_id>:environment:site-deploy (ycash-ops README,
+# "The ycash.team site"). The role may only write this bucket and invalidate this distribution. The
+# environment holds three values (from `terraform output -raw` in ycash-ops site/ycash-team/):
+# YCASH_TEAM_SITE_ROLE_ARN, YCASH_TEAM_SITE_BUCKET, YCASH_TEAM_SITE_DISTRIBUTION_ID. They are
+# environment secrets, never committed: this repository is public and so are its logs, and secrets
+# are masked in them (the values are masked below as well).
+name: deploy
+on:
+  push:
+    branches: [upgrade/vault]
+  workflow_dispatch: {}
+permissions: {}
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.ref == 'refs/heads/upgrade/vault'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with: { persist-credentials: false }
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      # make check = make build (copy the published files into public/) + scripts/check-site.py public
+      # (fails on broken nesting, anything the CSP would block, a broken internal link).
+      - run: make check
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: public
+          path: public/
+          include-hidden-files: true # a future public/.well-known/
+          if-no-files-found: error
+          retention-days: 3
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: site-deploy
+    permissions:
+      id-token: write
+    env:
+      BUCKET: ${{ secrets.YCASH_TEAM_SITE_BUCKET }}
+      DISTRIBUTION_ID: ${{ secrets.YCASH_TEAM_SITE_DISTRIBUTION_ID }}
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: public
+          path: public
+      - name: check the deploy values
+        run: |
+          set -euo pipefail
+          if [ -z "$BUCKET" ] || [ -z "$DISTRIBUTION_ID" ]; then
+            echo "set YCASH_TEAM_SITE_BUCKET and YCASH_TEAM_SITE_DISTRIBUTION_ID in the site-deploy environment" >&2
+            exit 1
+          fi
+          echo "::add-mask::$BUCKET"
+          echo "::add-mask::$DISTRIBUTION_ID"
+          test -f public/index.html
+          test -f public/404.html
+      - uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ secrets.YCASH_TEAM_SITE_ROLE_ARN }}
+          aws-region: us-east-1
+          role-session-name: ycash-team-site-deploy
+          role-duration-seconds: 900
+          mask-aws-account-id: true
+      # Upload first, delete last, so no page ever points at a file already removed. Classes:
+      #   images, icons     1 week  (stable names; a changed file gets a new name or waits a week)
+      #   css, js           1 hour  (site.css, site.js: unhashed names)
+      #   everything else   5 min   (HTML, robots.txt)
+      # CloudFront honours these (CachingOptimized); the invalidation below refreshes the edge at once.
+      - name: upload
+        run: |
+          set -euo pipefail
+          s3="s3://$BUCKET"
+          static=(--include '*.png' --include '*.webp' --include '*.jpg' --include '*.jpeg' --include '*.svg' --include '*.ico' --include '*.woff2')
+          code=(--include '*.css' --include '*.js')
+          rest=()
+          for p in '*.png' '*.webp' '*.jpg' '*.jpeg' '*.svg' '*.ico' '*.woff2' '*.css' '*.js'; do rest+=(--exclude "$p"); done
+          aws s3 sync public/ "$s3" --only-show-errors --exclude '*' "${static[@]}" \
+            --cache-control 'public, max-age=604800'
+          aws s3 sync public/ "$s3" --only-show-errors --exclude '*' "${code[@]}" \
+            --cache-control 'public, max-age=3600'
+          aws s3 sync public/ "$s3" --only-show-errors "${rest[@]}" \
+            --cache-control 'public, max-age=300'
+      # Everything is uploaded now, so this pass only removes objects no longer in public/:
+      # --size-only keeps it from re-uploading a file just written (which would drop its headers).
+      - name: remove stale objects
+        run: aws s3 sync public/ "s3://$BUCKET" --delete --size-only --only-show-errors
+      # One path, one invalidation (1,000 paths a month are free). Requested, not awaited.
+      - name: invalidate
+        run: |
+          set -euo pipefail
+          id=$(aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths '/*' \
+            --query Invalidation.Id --output text)
+          echo "invalidation $id requested (aws cloudfront get-invalidation --id $id to check, from your machine)" >> "$GITHUB_STEP_SUMMARY"
