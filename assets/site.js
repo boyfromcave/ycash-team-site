@@ -1,4 +1,4 @@
-// ycash.team: the rotating word, its pause button, the tile glow, the rise-in.
+// ycash.team: the rotating word, the tile glow, the rise-in.
 // Copyright (c) 2026 The Ycash developers. MIT licence (LICENSE).
 // Plain script, no dependencies, no inline code. Without it every page still reads
 // correctly: "Ycash = Your Electronic Cash", and every tile is a normal link.
@@ -40,7 +40,6 @@
   if (corner && word) {
     var index = 0;
     var timer = null;
-    var paused = false;
 
     var step = function () {
       index = (index + 1) % WORDS.length;
@@ -50,41 +49,9 @@
     };
 
     var start = function () {
-      if (!timer && !paused && !document.hidden) { timer = setInterval(step, HOLD_MS + SWAP_MS); }
+      if (!timer && !document.hidden) { timer = setInterval(step, HOLD_MS + SWAP_MS); }
     };
     var stop = function () { clearInterval(timer); timer = null; };
-
-    // A pause button (WCAG 2.2.2): moving text must be stoppable.
-    {
-      var ns = "http://www.w3.org/2000/svg";
-      var button = document.createElement("button");
-      button.type = "button";
-      button.className = "pause";
-      button.setAttribute("aria-pressed", "false");
-      button.setAttribute("aria-label", "Pause the moving words");
-      [["bars", "M8 5v14M16 5v14"], ["play", "M7 5l12 7-12 7z"]].forEach(function (icon) {
-        var svg = document.createElementNS(ns, "svg");
-        svg.setAttribute("viewBox", "0 0 24 24");
-        svg.setAttribute("class", icon[0]);
-        svg.setAttribute("aria-hidden", "true");
-        svg.setAttribute("fill", "none");
-        svg.setAttribute("stroke", "currentColor");
-        svg.setAttribute("stroke-width", "2.2");
-        svg.setAttribute("stroke-linecap", "round");
-        svg.setAttribute("stroke-linejoin", "round");
-        var path = document.createElementNS(ns, "path");
-        path.setAttribute("d", icon[1]);
-        svg.appendChild(path);
-        button.appendChild(svg);
-      });
-      button.addEventListener("click", function () {
-        paused = !paused;
-        button.setAttribute("aria-pressed", paused ? "true" : "false");
-        button.setAttribute("aria-label", paused ? "Play the moving words" : "Pause the moving words");
-        if (paused) { stop(); } else { start(); }
-      });
-      corner.appendChild(button);
-    }
 
     // do not spin in a background tab
     document.addEventListener("visibilitychange", function () {
