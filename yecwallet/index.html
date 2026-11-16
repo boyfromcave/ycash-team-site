@@ -34,12 +34,29 @@
   <main>
     <article class="card">
       <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 20.5h7M12 17v3.5"/><path d="M10 8l2 2.6L14 8M12 10.6V13.5"/></svg>
-      <span class="tag">Coming soon</span>
+      <span class="tag">Beta</span>
       <h1>YecWallet</h1>
       <p class="what">The Ycash wallet for your computer. This version adds a Yellowback tab for YED, a dollar on Ycash.</p>
-      <p class="how">There is no release of this version yet. Its source code is on GitHub.</p>
-      <a class="button" href="https://github.com/boyfromcave/yecwallet-dd" rel="noopener">Source on GitHub <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
+      <p class="how">YecWallet 6.22.0-beta3 is a pre-release for testing. It brings its own node, ycashd, so there is nothing else to install. Apple silicon Macs get <code>macos-arm64-yecwallet-v6.22.0-beta3.dmg</code>; other systems are built when possible and may be missing.</p>
+      <a class="button" href="https://github.com/boyfromcave/yecwallet-dd/releases/tag/v6.22.0-beta3" rel="noopener">Download YecWallet <svg class="arrow" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17L17 7M9 7h8v8"/></svg></a>
     </article>
+
+    <section class="card steps" aria-labelledby="check">
+      <h2 id="check">Check the download</h2>
+      <p class="how">The app is not signed or notarized by Apple. Our own signature is what shows the file is genuine. Download <code>SHA256SUMS</code> and <code>SHA256SUMS.minisig</code> from the same release, then in Terminal, in that folder:</p>
+      <pre><code>shasum -a 256 -c --ignore-missing SHA256SUMS
+brew install minisign
+minisign -Vm SHA256SUMS -P RWQYr5PFpiPJAigk86vf89bPYrJCXj5tskgRAPRYFsEXyciZo8dveOGQ</code></pre>
+      <p class="how">Expect <code>OK</code> next to your file, then <code>Signature and comment signature verified</code>. This is the Ycash release key (id <code>02C923A6C593AF18</code>) that also signs ycashd. If a check fails, delete the file and do not open it.</p>
+
+      <h2 id="first-run">Open it the first time on a Mac</h2>
+      <ol>
+        <li>Open the <code>.dmg</code> and drag <strong>yecwallet</strong> onto <strong>Applications</strong>.</li>
+        <li>Open yecwallet. macOS says Apple could not verify it. Click <strong>Done</strong>, not Move to Trash.</li>
+        <li>Open <strong>System Settings → Privacy &amp; Security</strong>, scroll to <strong>Security</strong> and click <strong>Open Anyway</strong>. Confirm with your password or Touch ID, then click <strong>Open Anyway</strong> once more.</li>
+      </ol>
+      <p class="how">Right-click → Open no longer skips this. The button shows for about an hour after the blocked attempt. A Mac managed by an organization may not offer it at all. The full guide is <a href="https://github.com/boyfromcave/yecwallet-dd/blob/upgrade/vault/docs/install-macos.md" rel="noopener">in the YecWallet repository</a>.</p>
+    </section>
     <p class="back"><a href="/">All products</a></p>
   </main>
 
