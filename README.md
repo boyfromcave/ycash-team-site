@@ -2,10 +2,11 @@
 
 The start page for people who are new to Ycash. In the top-left corner, at the page's left gutter:
 "Ycash = Your …" with a rotating phrase (Electronic Cash, Team, Life, Family, Collateral, Assets,
-Wallet, Future, ❤️, Friends, 🛡️, Vault) right after "Your", and a small button beside it that
-pauses the phrases. "Ycash = Your" never moves: the slot after it always reserves the longest
+Wallet, Future, ❤️, Friends, 🛡️, Vault) right after "Your"; the phrases rotate by themselves, with
+no control (a visitor who has asked their system for reduced motion gets a plain cross-fade and a
+still logo). "Ycash = Your" never moves: the slot after it always reserves the longest
 phrase. The line scrolls away with the page and fits on one line down to a 320-pixel phone. Then
-the Ycash logo, centred, and eight product tiles in two centred rows ("Use Ycash", "Run and
+the Ycash logo, centred, beating like a heart, and nine product tiles in two centred rows ("Use Ycash", "Run and
 build"); each tile leads to a one-screen page on the site: what the product is, how to get it, one
 button. No other text, no footer links. Plain static files, no build step, no dependencies.
 
@@ -18,10 +19,10 @@ make links   # the same, plus every external link must answer
 | Path | What |
 |---|---|
 | `index.html` | the start page |
-| `yew/`, `yecwallet/`, `explorer/`, `ycashd/`, `kogany/`, `yolo/`, `x402/`, `lightwalletd/` | one page per product (`index.html` each), served at `/<name>/` |
+| `yew/`, `yew-web/`, `yecwallet/`, `explorer/`, `ycashd/`, `kogany/`, `yolo/`, `x402/`, `lightwalletd/` | one page per product (`index.html` each), served at `/<name>/` |
 | `404.html` | the page CloudFront shows for a missing address |
 | `assets/site.css` | look, layout and motion; colours are the variables at the top |
-| `assets/site.js` | the rotating word and its pause button, the tile glow, the rise-in |
+| `assets/site.js` | the rotating word, the tile glow, the rise-in |
 | `assets/ycash-logo.svg` | the Ycash logo (presentation attributes only, no `style=""`, for the CSP) |
 | `scripts/check-site.py` | the check `make check` runs (standard library only) |
 | `.github/workflows/check.yml` | pull requests: `make check` and `make links` |
