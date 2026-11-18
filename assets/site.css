@@ -305,8 +305,6 @@ main { flex: 1 0 auto; }
     transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.28s, box-shadow 0.28s;
 }
 
-.row-use .tile { flex-basis: 232px; }
-
 .tile:hover,
 .tile:focus-within {
   transform: translateY(-6px);
@@ -345,6 +343,24 @@ main { flex: 1 0 auto; }
   border-radius: 999px;
   padding: 4px 9px;
   white-space: nowrap;
+}
+
+/* Status pills glow by stage: yellow while a product is in development, light green once it can be
+   used (testnet or beta). A steady glow, no animation. */
+.tag-dev {
+  color: #ffd98a;
+  border-color: rgba(255, 194, 71, 0.55);
+  background: rgba(255, 194, 71, 0.10);
+  box-shadow: 0 0 14px rgba(255, 194, 71, 0.38), inset 0 0 8px rgba(255, 194, 71, 0.10);
+  text-shadow: 0 0 8px rgba(255, 194, 71, 0.45);
+}
+
+.tag-live {
+  color: #b4f5c4;
+  border-color: rgba(126, 231, 156, 0.55);
+  background: rgba(126, 231, 156, 0.10);
+  box-shadow: 0 0 14px rgba(126, 231, 156, 0.36), inset 0 0 8px rgba(126, 231, 156, 0.10);
+  text-shadow: 0 0 8px rgba(126, 231, 156, 0.42);
 }
 
 /* In the flow, above the name: a long label never runs into the icon. */
