@@ -19,7 +19,7 @@ make links   # the same, plus every external link must answer
 | Path | What |
 |---|---|
 | `index.html` | the start page |
-| `yew/`, `yew-web/`, `yecwallet/`, `explorer/`, `ycashd/`, `kogany/`, `yolo/`, `x402/`, `lightwalletd/` | one page per product (`index.html` each), served at `/<name>/` |
+| `yew/`, `yew-web/`, `yecwallet/`, `explorer/`, `faucet/`, `ycashd/`, `kogany/`, `yolo/`, `x402/`, `lightwalletd/` | one page per product (`index.html` each), served at `/<name>/` |
 | `404.html` | the page CloudFront shows for a missing address |
 | `assets/site.css` | look, layout and motion; colours are the variables at the top |
 | `assets/site.js` | the rotating word, the tile glow, the rise-in |
